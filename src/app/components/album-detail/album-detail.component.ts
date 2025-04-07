@@ -19,7 +19,7 @@ export class AlbumDetailComponent {
   newPhotoTitle: string = '';
   newPhotoTags: string = ''; // For comma-separated tag input
   welcomeMessage: string = 'Explore Your Album!';
-  instructions: string = 'Add photos to this album using their URLs, tag them, sort by date or name, edit details, or delete them. Filter by tags or use bulk actions!';
+  instructions: string = 'Add photos to this album using their URLs, tag them, sort by date or name, edit details, or delete them. Filter by tags or use bulk actions! Drag photos to reorder them.';
   editingPhotoId: string | null = null;
   editTitle: string = '';
   editUrl: string = '';
@@ -28,6 +28,7 @@ export class AlbumDetailComponent {
   selectedPhotoIds: string[] = []; // For bulk actions
   showModal: boolean = false;
   selectedPhoto: Photo | null = null;
+  dragPhotoId: string | null = null; // Track the ID of the photo being dragged
 
   constructor(
     private route: ActivatedRoute,
@@ -156,6 +157,31 @@ export class AlbumDetailComponent {
         this.storageService.saveAlbums(albums);
       }
     }
+  }
+
+  // Drag and Drop Methods
+  onDragStart(event: DragEvent, photoId: string): void {
+    this.dragPhotoId = photoId;
+    event.dataTransfer?.setData('text/plain', photoId);
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault(); // Necessary to allow dropping
+  }
+
+  onDrop(event: DragEvent, targetPhotoId: string): void {
+    event.preventDefault();
+    if (this.album && this.dragPhotoId && this.dragPhotoId !== targetPhotoId) {
+      const draggedPhotoIndex = this.album.photos.findIndex(p => p.id === this.dragPhotoId);
+      const targetPhotoIndex = this.album.photos.findIndex(p => p.id === targetPhotoId);
+
+      if (draggedPhotoIndex !== -1 && targetPhotoIndex !== -1) {
+        const [draggedPhoto] = this.album.photos.splice(draggedPhotoIndex, 1);
+        this.album.photos.splice(targetPhotoIndex, 0, draggedPhoto);
+        this.updateStorage();
+      }
+    }
+    this.dragPhotoId = null;
   }
 
   // Remove a specific tag during editing

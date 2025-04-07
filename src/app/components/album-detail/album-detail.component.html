@@ -73,7 +73,14 @@
   
     <!-- Photo Grid -->
     <div class="photo-grid">
-      <div *ngFor="let photo of filterPhotos()" class="photo-card">
+      <div
+        *ngFor="let photo of filterPhotos()"
+        class="photo-card"
+        draggable="true"
+        (dragstart)="onDragStart($event, photo.id)"
+        (dragover)="onDragOver($event)"
+        (drop)="onDrop($event, photo.id)"
+      >
         <span
           class="custom-checkbox"
           [ngClass]="{'checked': selectedPhotoIds.includes(photo.id)}"
