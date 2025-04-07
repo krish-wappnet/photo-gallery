@@ -1,18 +1,21 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Album, Photo } from '../../models/album.model';
+import { FormsModule } from '@angular/forms';
+import { CdkDragDrop, moveItemInArray, CdkDragHandle, DragDropModule } from '@angular/cdk/drag-drop';
+import { Album, Photo } from '../../models/album.model'; // Single import for both interfaces
 import { StorageService } from '../../services/storage.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-photo-viewer',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, DragDropModule],
   templateUrl: './photo-viewer.component.html',
   styleUrls: ['./photo-viewer.component.scss']
 })
 export class PhotoViewerComponent {
   album?: Album;
+  showModal: boolean = false;
   currentPhoto?: Photo;
   photoIndex: number = 0;
   isSlideshowActive: boolean = false;
@@ -24,50 +27,79 @@ export class PhotoViewerComponent {
   startX: number = 0;
   startY: number = 0;
   albumId: string | null = null; // To store the album ID
+  newTag: string = ''; // For tag input
 
   constructor(
     private route: ActivatedRoute,
     private storageService: StorageService,
-    private router: Router // Added for navigation
+    private router: Router
   ) {
     this.loadPhoto();
   }
 
+  
+
+  openModal(): void {
+    this.showModal = true;
+  }
+
+  // Method to close the modal
+  stopPropagation(event: Event): void {
+    event.stopPropagation();
+  }
+  
+  closeModal(event: Event): void {
+    event.stopPropagation(); // Prevent closing when clicking inside modal content
+    this.showModal = false;
+  }
+
   private loadPhoto(): void {
-    this.albumId = this.route.snapshot.paramMap.get('albumId'); // Store albumId
+    this.albumId = this.route.snapshot.paramMap.get('albumId');
     const photoId = this.route.snapshot.paramMap.get('photoId');
-    
+    console.log('Loading photo - albumId:', this.albumId, 'photoId:', photoId); // Debug log
+  
     if (this.albumId && photoId) {
       this.album = this.storageService.getAlbums().find(a => a.id === this.albumId);
       if (this.album) {
+        console.log('Album found:', this.album); // Debug log
         this.photoIndex = this.album.photos.findIndex(p => p.id === photoId);
         if (this.photoIndex !== -1) {
-          this.currentPhoto = this.album.photos[this.photoIndex];
+          this.currentPhoto = { ...this.album.photos[this.photoIndex] }; // Create a copy for editing
+          console.log('Current Photo:', this.currentPhoto); // Debug log
+        } else {
+          console.warn('Photo not found in album:', photoId);
+          this.router.navigate(['albums', this.albumId]); // Redirect if photo not found
         }
+      } else {
+        console.warn('Album not found:', this.albumId);
+        this.router.navigate(['/albums']); // Redirect if album not found
       }
+    } else {
+      console.warn('Invalid albumId or photoId:', this.albumId, photoId);
+      this.router.navigate(['/albums']); // Redirect if parameters are invalid
     }
   }
 
   nextPhoto(): void {
     if (this.album && this.currentPhoto) {
       this.photoIndex = (this.photoIndex + 1) % this.album.photos.length;
-      this.currentPhoto = this.album.photos[this.photoIndex];
-      this.resetZoom(); // Reset zoom when changing photos
+      this.currentPhoto = { ...this.album.photos[this.photoIndex] }; // Update current photo
+      this.resetZoom();
     }
   }
 
   previousPhoto(): void {
     if (this.album && this.currentPhoto) {
       this.photoIndex = (this.photoIndex - 1 + this.album.photos.length) % this.album.photos.length;
-      this.currentPhoto = this.album.photos[this.photoIndex];
-      this.resetZoom(); // Reset zoom when changing photos
+      this.currentPhoto = { ...this.album.photos[this.photoIndex] }; // Update current photo
+      this.resetZoom();
     }
   }
 
   toggleFavorite(): void {
-    if (this.currentPhoto) {
+    if (this.currentPhoto && this.album) {
       this.currentPhoto.isFavorite = !this.currentPhoto.isFavorite;
-      this.updateStorage();
+      this.updatePhotoInAlbum();
     }
   }
 
@@ -81,9 +113,11 @@ export class PhotoViewerComponent {
 
   startSlideshow(): void {
     this.isSlideshowActive = true;
+    this.photoIndex = 0; // Reset to first photo
+    this.currentPhoto = { ...this.album!.photos[this.photoIndex] }; // Update to first photo
     this.slideshowInterval = setInterval(() => {
       this.nextPhoto();
-    }, 3000); // Change photo every 3 seconds
+    }, 3000);
   }
 
   stopSlideshow(): void {
@@ -95,12 +129,12 @@ export class PhotoViewerComponent {
 
   zoomIn(): void {
     this.scale += 0.1;
-    if (this.scale > 3) this.scale = 3; // Max zoom limit
+    if (this.scale > 3) this.scale = 3;
   }
 
   zoomOut(): void {
     this.scale -= 0.1;
-    if (this.scale < 1) this.scale = 1; // Min zoom limit
+    if (this.scale < 1) this.scale = 1;
   }
 
   resetZoom(): void {
@@ -111,7 +145,51 @@ export class PhotoViewerComponent {
 
   goBack(): void {
     if (this.albumId) {
-      this.router.navigate(['albums', this.albumId]); // Navigate to albums/:id
+      this.router.navigate(['albums', this.albumId]);
+    }
+  }
+
+  addTag(): void {
+    if (this.newTag.trim() && this.currentPhoto && this.album) {
+      if (!this.currentPhoto.tags) this.currentPhoto.tags = [];
+      if (!this.currentPhoto.tags.includes(this.newTag.trim())) {
+        this.currentPhoto.tags.push(this.newTag.trim());
+        this.updatePhotoInAlbum();
+      }
+      this.newTag = ''; // Reset input
+    }
+  }
+
+  removeTag(tag: string): void {
+    if (this.currentPhoto && this.album) {
+      this.currentPhoto.tags = this.currentPhoto.tags?.filter(t => t !== tag);
+      this.updatePhotoInAlbum();
+    }
+  }
+
+  drop(event: CdkDragDrop<Photo[]>): void {
+    if (this.album) {
+      moveItemInArray(this.album.photos, event.previousIndex, event.currentIndex);
+      this.updateStorage();
+      this.currentPhoto = { ...this.album.photos[this.photoIndex] }; // Update current photo
+    }
+  }
+
+  private updatePhotoInAlbum(): void {
+    if (this.album && this.currentPhoto) {
+      this.album.photos[this.photoIndex] = { ...this.currentPhoto };
+      this.updateStorage();
+    }
+  }
+
+  private updateStorage(): void {
+    if (this.album) {
+      const albums = this.storageService.getAlbums();
+      const index = albums.findIndex(a => a.id === this.album!.id);
+      if (index !== -1) {
+        albums[index] = this.album;
+        this.storageService.saveAlbums(albums);
+      }
     }
   }
 
@@ -151,16 +229,5 @@ export class PhotoViewerComponent {
   @HostListener('mouseleave')
   onMouseLeave(): void {
     this.isDragging = false;
-  }
-
-  private updateStorage(): void {
-    if (this.album) {
-      const albums = this.storageService.getAlbums();
-      const index = albums.findIndex(a => a.id === this.album!.id);
-      if (index !== -1) {
-        albums[index] = this.album;
-        this.storageService.saveAlbums(albums);
-      }
-    }
   }
 }

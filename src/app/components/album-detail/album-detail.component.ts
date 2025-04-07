@@ -12,6 +12,7 @@ import { StorageService } from '../../services/storage.service';
   templateUrl: './album-detail.component.html',
   styleUrls: ['./album-detail.component.scss'] 
 })
+
 export class AlbumDetailComponent {
   album?: Album; 
   sortBy: 'date' | 'name' = 'date';
@@ -19,9 +20,11 @@ export class AlbumDetailComponent {
   newPhotoTitle: string = ''; 
   welcomeMessage: string = 'Explore Your Album!';
   instructions: string = 'Add photos to this album using their URLs, sort them by date or name, edit their details, or delete them. Click a photo to view it in fullscreen. Start by adding your first photo below!';
-  editingPhotoId: string | null = null; // Track the photo being edited
-  editTitle: string = ''; // Temporary title for editing
-  editUrl: string = ''; // Temporary URL for editing
+  editingPhotoId: string | null = null; 
+  editTitle: string = ''; 
+  editUrl: string = ''; 
+  selectedPhoto: Photo | null = null; // Track selected photo for modal
+  showModal: boolean = false; // Modal state
 
   constructor(
     private route: ActivatedRoute,
@@ -37,6 +40,24 @@ export class AlbumDetailComponent {
     }
   }
 
+  // Open modal with selected photo
+  openModal(photo: Photo): void {
+    this.selectedPhoto = { ...photo }; // Create a copy to avoid direct mutation
+    this.showModal = true;
+  }
+
+  // Close modal, accepting event parameter
+  closeModal(event: MouseEvent): void {
+    event.stopPropagation(); // Stop propagation when clicking the modal background
+    this.showModal = false;
+    this.selectedPhoto = null;
+  }
+
+  stopPropagation(event: Event): void {
+    event.stopPropagation();
+  }
+
+  // Existing methods (addPhoto, deletePhoto, etc.) remain unchanged
   addPhoto(): void {
     if (this.album && this.newPhotoUrl && this.newPhotoTitle) {
       const photo: Photo = {
