@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; 
-import { RouterModule } from '@angular/router'; 
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { Album } from '../../models/album.model';
 import { StorageService } from '../../services/storage.service';
 
@@ -10,15 +10,17 @@ import { StorageService } from '../../services/storage.service';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './album-list.component.html',
-  styleUrls: ['./album-list.component.scss'] 
+  styleUrls: ['./album-list.component.scss']
 })
 export class AlbumListComponent {
   albums: Album[] = [];
-  newAlbumName: string = ''; // For form input
+  newAlbumName: string = '';
   welcomeMessage: string = 'Welcome to Your Photo Gallery!';
-  instructions: string = 'Create albums to organize your favorite photos. Add photos using image URLs and explore them in a fullscreen viewer. Start by adding your first album below!';
-  showDeleteDialog: boolean = false; // State for delete confirmation dialog
-  albumToDelete: Album | null = null; // Track the album to delete
+  instructions: string = 'Create, edit, and organize your favorite photo albums. Add photos using image URLs and explore them in a fullscreen viewer. Start by adding your first album below!';
+  showDeleteDialog: boolean = false;
+  albumToDelete: Album | null = null;
+  editingAlbumId: string | null = null; // Track which album is being edited
+  albumEditName: string = ''; // Temporary storage for editing name
 
   constructor(private storageService: StorageService) {
     this.albums = this.storageService.getAlbums();
@@ -34,8 +36,26 @@ export class AlbumListComponent {
       };
       this.albums.push(newAlbum);
       this.storageService.saveAlbums(this.albums);
-      this.newAlbumName = ''; // Reset input
+      this.newAlbumName = '';
     }
+  }
+
+  startEditing(album: Album): void {
+    this.editingAlbumId = album.id;
+    this.albumEditName = album.name; // Pre-fill with current name
+  }
+
+  saveEdit(album: Album): void {
+    if (this.albumEditName.trim() && this.editingAlbumId === album.id) {
+      album.name = this.albumEditName.trim();
+      this.storageService.saveAlbums(this.albums);
+    }
+    this.cancelEdit();
+  }
+
+  cancelEdit(): void {
+    this.editingAlbumId = null;
+    this.albumEditName = '';
   }
 
   openDeleteDialog(album: Album): void {

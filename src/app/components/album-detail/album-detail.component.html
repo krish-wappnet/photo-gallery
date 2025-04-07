@@ -1,119 +1,140 @@
 <div class="album-detail" *ngIf="album; else noAlbum">
-    <!-- Welcome Section -->
-    <section class="welcome-section">
-      <h1>{{ welcomeMessage }}</h1>
-      <p class="instructions">{{ instructions }}</p>
-    </section>
+    <!-- Header Section -->
+    <header class="header-section">
+      <h1 class="album-title">{{ album.name }}</h1>
+      <section class="welcome-section">
+        <h2>{{ welcomeMessage }}</h2>
+        <p class="instructions">{{ instructions }}</p>
+      </section>
+    </header>
   
-    <!-- Album Info -->
-    <h2 class="album-title">{{ album.name }}</h2>
-  
-    <!-- Add Photo Form -->
-    <div class="add-photo-form">
-      <label for="photo-title-input" class="visually-hidden">Photo Title</label>
-      <input
-        id="photo-title-input"
-        type="text"
-        [(ngModel)]="newPhotoTitle"
-        placeholder="Enter Photo Title"
-        required
-      />
-      <label for="photo-url-input" class="visually-hidden">Photo URL</label>
-      <input
-        id="photo-url-input"
-        type="url"
-        [(ngModel)]="newPhotoUrl"
-        placeholder="Enter Photo URL"
-        required
-      />
-      <label for="photo-tags-input" class="visually-hidden">Tags (comma-separated)</label>
-      <div class="add-tags-container">
-        <div class="current-tags" *ngIf="newTagsArray.length > 0">
-          <span class="tag" *ngFor="let tag of newTagsArray" (click)="removeNewTag(tag); $event.stopPropagation()">
-            {{ tag }} <span class="remove-tag">×</span>
-          </span>
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+      <!-- Add Photo Form -->
+      <div class="add-photo-section">
+        <h3>Add a New Photo</h3>
+        <div class="add-photo-form">
+          <label for="photo-title-input" class="visually-hidden">Photo Title</label>
+          <input
+            id="photo-title-input"
+            type="text"
+            [(ngModel)]="newPhotoTitle"
+            placeholder="Enter Photo Title"
+            required
+          />
+          <label for="photo-url-input" class="visually-hidden">Photo URL</label>
+          <input
+            id="photo-url-input"
+            type="url"
+            [(ngModel)]="newPhotoUrl"
+            placeholder="Enter Photo URL"
+            required
+          />
+          <label for="photo-tags-input" class="visually-hidden">Tags (comma-separated)</label>
+          <div class="add-tags-container">
+            <div class="current-tags" *ngIf="newTagsArray.length > 0">
+              <span class="tag" *ngFor="let tag of newTagsArray" (click)="removeNewTag(tag); $event.stopPropagation()">
+                {{ tag }} <span class="remove-tag">×</span>
+              </span>
+            </div>
+            <input
+              id="photo-tags-input"
+              type="text"
+              [(ngModel)]="newPhotoTags"
+              placeholder="Enter Tags (e.g., Vacation, Lunch)"
+              (input)="updateNewTags()"
+            />
+          </div>
+          <button (click)="addPhoto()" [disabled]="!newPhotoTitle || !newPhotoUrl">
+            <span class="button-text">Add Photo</span>
+            <span class="button-icon">+</span>
+          </button>
         </div>
-        <input
-          id="photo-tags-input"
-          type="text"
-          [(ngModel)]="newPhotoTags"
-          placeholder="Enter Tags (e.g., Vacation, Lunch)"
-          (input)="updateNewTags()"
-        />
       </div>
-      <button (click)="addPhoto()" [disabled]="!newPhotoTitle || !newPhotoUrl">
-        <span class="button-text">Add Photo</span>
-        <span class="button-icon">+</span>
-      </button>
-    </div>
   
-    <!-- Sort and Filter Controls -->
-    <div class="controls">
-      <div class="sort-controls">
-        <label>Sort by:</label>
-        <select [(ngModel)]="sortBy" (change)="sortPhotos()">
-          <option value="date">Date</option>
-          <option value="name">Name</option>
-        </select>
-      </div>
-      <div class="filter-controls">
-        <label for="filter-tag">Filter by Tag:</label>
-        <input
-          id="filter-tag"
-          type="text"
-          [(ngModel)]="filterTag"
-          placeholder="Enter tag to filter"
-          (input)="filterPhotos()"
-        />
-      </div>
-      <div class="bulk-actions" *ngIf="selectedPhotoIds.length > 0">
-        <button (click)="bulkDelete()">Delete Selected ({{ selectedPhotoIds.length }})</button>
-      </div>
-    </div>
-  
-    <!-- Photo Grid -->
-    <div class="photo-grid">
-      <div
-        *ngFor="let photo of filterPhotos()"
-        class="photo-card"
-        draggable="true"
-        (dragstart)="onDragStart($event, photo.id)"
-        (dragover)="onDragOver($event)"
-        (drop)="onDrop($event, photo.id)"
-      >
-        <span
-          class="custom-checkbox"
-          [ngClass]="{'checked': selectedPhotoIds.includes(photo.id)}"
-          (click)="togglePhotoSelection(photo.id); $event.stopPropagation()"
-        ></span>
-        <a [routerLink]="['/viewer', album.id, photo.id]">
-          <img [src]="photo.url" [alt]="photo.title" class="photo-image" />
-        </a>
-        <div class="photo-info" *ngIf="editingPhotoId !== photo.id">
-          <p class="photo-title">{{ photo.title }}</p>
-          <p class="photo-date">{{ photo.dateAdded | date }}</p>
-          <div class="photo-tags" *ngIf="photo.tags?.length">
-            <span class="tag" *ngFor="let tag of photo.tags">{{ tag }}</span>
+      <!-- Controls Section -->
+      <div class="controls-section">
+        <h3>Manage Photos</h3>
+        <div class="controls">
+          <div class="sort-controls">
+            <label>Sort by:</label>
+            <select [(ngModel)]="sortBy" (change)="sortPhotos()">
+              <option value="date">Date</option>
+              <option value="name">Name</option>
+            </select>
+          </div>
+          <div class="filter-controls">
+            <label for="filter-tag">Filter by Tag:</label>
+            <input
+              id="filter-tag"
+              type="text"
+              [(ngModel)]="filterTag"
+              placeholder="Enter tag to filter"
+              (input)="filterPhotos()"
+            />
+          </div>
+          <div class="bulk-actions" *ngIf="selectedPhotoIds.length > 0">
+            <button (click)="bulkDelete()">Delete Selected ({{ selectedPhotoIds.length }})</button>
           </div>
         </div>
-        <div class="photo-edit" *ngIf="editingPhotoId === photo.id">
-          <label for="edit-title-{{photo.id}}" class="visually-hidden">Edit Title</label>
+      </div>
+  
+      <!-- Photo Grid Section -->
+      <div class="photo-grid-section">
+        <h3>Your Photos</h3>
+        <div class="photo-grid">
+          <div
+            *ngFor="let photo of filterPhotos()"
+            class="photo-card"
+            draggable="true"
+            (dragstart)="onDragStart($event, photo.id)"
+            (dragover)="onDragOver($event)"
+            (drop)="onDrop($event, photo.id)"
+          >
+            <span
+              class="custom-checkbox"
+              [ngClass]="{'checked': selectedPhotoIds.includes(photo.id)}"
+              (click)="togglePhotoSelection(photo.id); $event.stopPropagation()"
+            ></span>
+            <a [routerLink]="['/viewer', album.id, photo.id]">
+              <img [src]="photo.url" [alt]="photo.title" class="photo-image" />
+            </a>
+            <div class="photo-info">
+              <p class="photo-title">{{ photo.title }}</p>
+              <p class="photo-date">{{ photo.dateAdded | date }}</p>
+              <div class="photo-tags" *ngIf="photo.tags?.length">
+                <span class="tag" *ngFor="let tag of photo.tags">{{ tag }}</span>
+              </div>
+            </div>
+            <div class="button-group">
+              <button class="edit-button" (click)="openEditModal(photo)">Edit</button>
+              <button class="delete-button" (click)="deletePhoto(photo.id)">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Edit Modal -->
+      <div class="edit-modal" *ngIf="showEditModal" (click)="closeEditModal($event)">
+        <div class="modal-content">
+          <h3>Edit Photo</h3>
+          <label for="edit-title" class="visually-hidden">Edit Title</label>
           <input
-            id="edit-title-{{photo.id}}"
+            id="edit-title"
             type="text"
             [(ngModel)]="editTitle"
             placeholder="Edit Title"
             required
           />
-          <label for="edit-url-{{photo.id}}" class="visually-hidden">Edit URL</label>
+          <label for="edit-url" class="visually-hidden">Edit URL</label>
           <input
-            id="edit-url-{{photo.id}}"
+            id="edit-url"
             type="url"
             [(ngModel)]="editUrl"
             placeholder="Edit URL"
             required
           />
-          <label for="edit-tags-{{photo.id}}" class="visually-hidden">Edit Tags</label>
+          <label for="edit-tags" class="visually-hidden">Edit Tags</label>
           <div class="edit-tags-container">
             <div class="current-tags" *ngIf="editTagsArray.length > 0">
               <span class="tag" *ngFor="let tag of editTagsArray" (click)="removeTag(tag); $event.stopPropagation()">
@@ -121,19 +142,17 @@
               </span>
             </div>
             <input
-              id="edit-tags-{{photo.id}}"
+              id="edit-tags"
               type="text"
               [(ngModel)]="editTags"
-              placeholder="Add or edit tags (comma-separated)"
+              placeholder="Add or edit tags"
               (input)="updateTags()"
             />
           </div>
-          <button class="save-button" (click)="saveEdit()">Save</button>
-          <button class="cancel-button" (click)="cancelEdit()">Cancel</button>
-        </div>
-        <div class="button-group" *ngIf="editingPhotoId !== photo.id">
-          <button class="edit-button" (click)="startEdit(photo)">Edit</button>
-          <button class="delete-button" (click)="deletePhoto(photo.id)">Delete</button>
+          <div class="modal-actions">
+            <button class="save-button" (click)="saveEdit()">Save</button>
+            <button class="cancel-button" (click)="closeEditModal()">Cancel</button>
+          </div>
         </div>
       </div>
     </div>

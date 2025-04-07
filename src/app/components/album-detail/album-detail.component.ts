@@ -17,18 +17,19 @@ export class AlbumDetailComponent {
   sortBy: 'date' | 'name' = 'date';
   newPhotoUrl: string = '';
   newPhotoTitle: string = '';
-  newPhotoTags: string = ''; // For comma-separated tag input
+  newPhotoTags: string = '';
   welcomeMessage: string = 'Explore Your Album!';
   instructions: string = 'Add photos to this album using their URLs, tag them, sort by date or name, edit details, or delete them. Filter by tags or use bulk actions! Drag photos to reorder them.';
   editingPhotoId: string | null = null;
   editTitle: string = '';
   editUrl: string = '';
-  editTags: string = ''; // For editing tags
-  filterTag: string = ''; // For filtering by tag
-  selectedPhotoIds: string[] = []; // For bulk actions
-  showModal: boolean = false;
+  editTags: string = '';
+  filterTag: string = '';
+  selectedPhotoIds: string[] = [];
+  showModal: boolean = false; // For another modal if needed (e.g., delete confirmation)
+  showEditModal: boolean = false; // For the edit modal
   selectedPhoto: Photo | null = null;
-  dragPhotoId: string | null = null; // Track the ID of the photo being dragged
+  dragPhotoId: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -85,11 +86,28 @@ export class AlbumDetailComponent {
     }
   }
 
-  startEdit(photo: Photo): void {
+  openEditModal(photo: Photo): void {
     this.editingPhotoId = photo.id;
     this.editTitle = photo.title;
     this.editUrl = photo.url;
-    this.editTags = photo.tags?.join(', ') || ''; // Join multiple tags for editing
+    this.editTags = photo.tags?.join(', ') || '';
+    this.showEditModal = true;
+  }
+
+  closeEditModal(event?: MouseEvent): void {
+    if (event && (event.target as HTMLElement).classList.contains('edit-modal')) {
+      this.showEditModal = false;
+      this.editingPhotoId = null;
+      this.editTitle = '';
+      this.editUrl = '';
+      this.editTags = '';
+    } else if (!event) {
+      this.showEditModal = false;
+      this.editingPhotoId = null;
+      this.editTitle = '';
+      this.editUrl = '';
+      this.editTags = '';
+    }
   }
 
   saveEdit(): void {
@@ -101,15 +119,8 @@ export class AlbumDetailComponent {
         photo.tags = this.getTagsFromString(this.editTags);
         this.updateStorage();
       }
-      this.cancelEdit();
+      this.closeEditModal();
     }
-  }
-
-  cancelEdit(): void {
-    this.editingPhotoId = null;
-    this.editTitle = '';
-    this.editUrl = '';
-    this.editTags = '';
   }
 
   sortPhotos(): void {
@@ -159,14 +170,13 @@ export class AlbumDetailComponent {
     }
   }
 
-  // Drag and Drop Methods
   onDragStart(event: DragEvent, photoId: string): void {
     this.dragPhotoId = photoId;
     event.dataTransfer?.setData('text/plain', photoId);
   }
 
   onDragOver(event: DragEvent): void {
-    event.preventDefault(); // Necessary to allow dropping
+    event.preventDefault();
   }
 
   onDrop(event: DragEvent, targetPhotoId: string): void {
@@ -184,31 +194,19 @@ export class AlbumDetailComponent {
     this.dragPhotoId = null;
   }
 
-  // Remove a specific tag during editing
   removeTag(tagToRemove: string): void {
-    if (this.editingPhotoId && this.album) {
-      const photo = this.album.photos.find(p => p.id === this.editingPhotoId);
-      if (photo && photo.tags) {
-        photo.tags = photo.tags.filter(tag => tag !== tagToRemove);
-        this.editTags = photo.tags.join(', '); // Update the input field
-        this.updateStorage();
-      }
+    const tagsArray = this.getTagsFromString(this.editTags);
+    const index = tagsArray.indexOf(tagToRemove);
+    if (index !== -1) {
+      tagsArray.splice(index, 1);
+      this.editTags = tagsArray.join(', ');
     }
   }
 
-  // Update tags in real-time as user types during editing
   updateTags(): void {
-    if (this.editingPhotoId && this.album) {
-      const photo = this.album.photos.find(p => p.id === this.editingPhotoId);
-      if (photo) {
-        const newTags = this.getTagsFromString(this.editTags);
-        photo.tags = newTags;
-        this.updateStorage();
-      }
-    }
+    // No need to update storage here; handled in saveEdit()
   }
 
-  // Remove a specific tag during upload
   removeNewTag(tagToRemove: string): void {
     const tagsArray = this.getTagsFromString(this.newPhotoTags);
     const index = tagsArray.indexOf(tagToRemove);
@@ -218,28 +216,19 @@ export class AlbumDetailComponent {
     }
   }
 
-  // Update tags in real-time as user types during upload
   updateNewTags(): void {
-    // This method is called on input, but we only need to ensure the display updates
-    // The actual saving happens in addPhoto()
+    // Display-only update; saving happens in addPhoto()
   }
 
-  // Helper method to process tags from a string
   private getTagsFromString(tagsString: string): string[] {
     return tagsString.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
   }
 
-  // Getter to get the current tags array for display
   get newTagsArray(): string[] {
     return this.getTagsFromString(this.newPhotoTags);
   }
 
-  // Getter to get the current tags array for editing display
   get editTagsArray(): string[] {
-    if (this.editingPhotoId && this.album) {
-      const photo = this.album.photos.find(p => p.id === this.editingPhotoId);
-      return photo ? this.getTagsFromString(photo.tags?.join(', ') || '') : [];
-    }
     return this.getTagsFromString(this.editTags);
   }
 }

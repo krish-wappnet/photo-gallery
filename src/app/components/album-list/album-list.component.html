@@ -24,17 +24,38 @@
   
     <!-- Album List -->
     <div class="album-grid" *ngIf="albums.length > 0; else noAlbums">
-      <div *ngFor="let album of albums" class="album-card">
-        <a [routerLink]="['/albums', album.id]">
-          <div class="album-cover">
-            <h2>{{ album.name }}</h2>
-            <p class="photo-count">{{ album.photos.length }} photo{{ album.photos.length === 1 ? '' : 's' }}</p>
+      <div *ngFor="let album of albums" class="album-card" [class.editing]="editingAlbumId === album.id">
+        <!-- View Mode -->
+        <div class="album-content" *ngIf="editingAlbumId !== album.id">
+          <a [routerLink]="['/albums', album.id]" class="album-link">
+            <div class="album-cover">
+              <h2>{{ album.name }}</h2>
+              <p class="photo-count">{{ album.photos.length }} photo{{ album.photos.length === 1 ? '' : 's' }}</p>
+            </div>
+            <p class="created-date">Created: {{ album.createdDate | date }}</p>
+          </a>
+          <div class="album-actions">
+            <button class="edit-btn" (click)="startEditing(album); $event.preventDefault()">✏️</button>
+            <button class="delete-btn" (click)="openDeleteDialog(album); $event.preventDefault()">✖</button>
           </div>
-          <p class="created-date">Created: {{ album.createdDate | date }}</p>
-        </a>
-        <button class="delete-btn" (click)="openDeleteDialog(album); $event.preventDefault()">
-          <span class="delete-icon">✖</span>
-        </button>
+        </div>
+  
+        <!-- Edit Mode -->
+        <div class="edit-form" *ngIf="editingAlbumId === album.id">
+          <input 
+            type="text" 
+            [(ngModel)]="albumEditName" 
+            (keyup.enter)="saveEdit(album)"
+            (blur)="saveEdit(album)"
+            placeholder="Edit Album Name"
+            class="edit-input"
+            required
+          />
+          <div class="edit-actions">
+            <button class="save-btn" (click)="saveEdit(album)">✔️</button>
+            <button class="cancel-btn" (click)="cancelEdit()">❌</button>
+          </div>
+        </div>
       </div>
     </div>
   
