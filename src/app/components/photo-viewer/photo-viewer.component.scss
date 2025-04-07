@@ -12,6 +12,27 @@
     color: #e0e0e0;
     z-index: 1000;
   
+    &.slideshow-mode {
+      .photo-container {
+        max-width: 100vw; // Full width
+        max-height: 100vh; // Full height
+        width: 100%;
+        height: 100%;
+  
+        .photo {
+          width: 100%;
+          height: 100%;
+          object-fit: contain; // Ensures the entire image fits
+          border-radius: 0; // Remove border radius for full-screen effect
+        }
+      }
+  
+      .controls {
+        // Keep controls visible but adjust if needed
+        z-index: 1001; // Ensure controls stay above the image
+      }
+    }
+  
     .controls {
       position: absolute;
       top: 20px;
@@ -46,7 +67,9 @@
         }
       }
   
-      .nav-btn, .slideshow-btn, .favorite-btn {
+      .nav-btn,
+      .slideshow-btn,
+      .favorite-btn {
         padding: 8px 12px;
         background: linear-gradient(90deg, #ffd700, #ffca2c); // Yellow gradient
         color: #1a1a1a;
@@ -212,9 +235,7 @@
       }
     }
   }
-
-
-
+  
   .modal {
     position: fixed;
     top: 0;
@@ -268,7 +289,7 @@
     }
   }
   
-  // Ensure clicking the photo-container doesn't propagate to modal
+ 
   .photo-container {
-    cursor: pointer; // Indicate clickable
+    cursor: pointer; 
   }

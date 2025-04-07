@@ -83,19 +83,22 @@ export class PhotoViewerComponent {
   nextPhoto(): void {
     if (this.album && this.currentPhoto) {
       this.photoIndex = (this.photoIndex + 1) % this.album.photos.length;
-      this.currentPhoto = { ...this.album.photos[this.photoIndex] }; // Update current photo
-      this.resetZoom();
+      this.currentPhoto = { ...this.album.photos[this.photoIndex] };
+      if (this.isSlideshowActive) {
+        this.resetZoom(); // Keep zoom reset during slideshow
+      }
     }
   }
 
   previousPhoto(): void {
     if (this.album && this.currentPhoto) {
       this.photoIndex = (this.photoIndex - 1 + this.album.photos.length) % this.album.photos.length;
-      this.currentPhoto = { ...this.album.photos[this.photoIndex] }; // Update current photo
-      this.resetZoom();
+      this.currentPhoto = { ...this.album.photos[this.photoIndex] };
+      if (this.isSlideshowActive) {
+        this.resetZoom(); // Keep zoom reset during slideshow
+      }
     }
   }
-
   toggleFavorite(): void {
     if (this.currentPhoto && this.album) {
       this.currentPhoto.isFavorite = !this.currentPhoto.isFavorite;
@@ -115,6 +118,7 @@ export class PhotoViewerComponent {
     this.isSlideshowActive = true;
     this.photoIndex = 0; // Reset to first photo
     this.currentPhoto = { ...this.album!.photos[this.photoIndex] }; // Update to first photo
+    this.resetZoom(); // Ensure image is at default size
     this.slideshowInterval = setInterval(() => {
       this.nextPhoto();
     }, 3000);
@@ -124,7 +128,9 @@ export class PhotoViewerComponent {
     this.isSlideshowActive = false;
     if (this.slideshowInterval) {
       clearInterval(this.slideshowInterval);
+      this.slideshowInterval = undefined; // Clear reference
     }
+    this.resetZoom(); // Reset zoom when stopping
   }
 
   zoomIn(): void {
