@@ -17,6 +17,8 @@ export class AlbumDetailComponent {
   sortBy: 'date' | 'name' = 'date';
   newPhotoUrl: string = ''; 
   newPhotoTitle: string = ''; 
+  welcomeMessage: string = 'Explore Your Album!';
+  instructions: string = 'Add photos to this album using their URLs and sort them by date or name. Click a photo to view it in fullscreen or delete it. Start by adding your first photo below!';
 
   constructor(
     private route: ActivatedRoute,
@@ -47,6 +49,13 @@ export class AlbumDetailComponent {
       // Reset form inputs
       this.newPhotoUrl = '';
       this.newPhotoTitle = '';
+    }
+  }
+
+  deletePhoto(photoId: string): void {
+    if (this.album) {
+      this.album.photos = this.album.photos.filter(photo => photo.id !== photoId);
+      this.updateStorage();
     }
   }
 
