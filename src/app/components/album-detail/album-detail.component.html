@@ -1,0 +1,49 @@
+<div class="album-detail" *ngIf="album; else noAlbum">
+    <h1>{{ album.name }}</h1>
+    
+    <!-- Add Photo Form -->
+    <div class="add-photo-form">
+      <input 
+        type="text" 
+        [(ngModel)]="newPhotoTitle" 
+        placeholder="Photo Title" 
+        required 
+      />
+      <input 
+        type="url" 
+        [(ngModel)]="newPhotoUrl" 
+        placeholder="Photo URL" 
+        required 
+      />
+      <button (click)="addPhoto()" [disabled]="!newPhotoTitle || !newPhotoUrl">
+        Add Photo
+      </button>
+    </div>
+  
+    <!-- Sort Controls -->
+    <div class="sort-controls">
+      <label>Sort by:</label>
+      <select [(ngModel)]="sortBy" (change)="sortPhotos()">
+        <option value="date">Date</option>
+        <option value="name">Name</option>
+      </select>
+    </div>
+  
+    <!-- Photo Grid -->
+    <div class="photo-grid">
+      <div *ngFor="let photo of album.photos" class="photo-card">
+        <a [routerLink]="['/viewer', album.id, photo.id]">
+          <img [src]="photo.url" [alt]="photo.title" />
+        </a>
+        <p>{{ photo.title }}</p>
+        <p>{{ photo.dateAdded | date }}</p>
+      </div>
+    </div>
+  </div>
+  
+  <ng-template #noAlbum>
+    <div class="error-message">
+      <p>Album not found</p>
+      <a routerLink="/albums">Return to Albums</a>
+    </div>
+  </ng-template>

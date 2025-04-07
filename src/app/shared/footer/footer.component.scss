@@ -1,0 +1,28 @@
+.footer {
+    background: #333;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1); // Slight shadow
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      p {
+        margin: 0 0 10px;
+        font-size: 14px;
+      }
+      .footer-links {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        a {
+          color: #ffd700;
+          text-decoration: none;
+          font-size: 14px;
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }

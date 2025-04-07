@@ -1,0 +1,32 @@
+<div class="album-list">
+    <h1>Photo Albums</h1>
+  
+    <!-- Add Album Form -->
+    <div class="add-album-form">
+      <input 
+        type="text" 
+        [(ngModel)]="newAlbumName" 
+        placeholder="New Album Name" 
+        (keyup.enter)="addAlbum()"
+        required 
+      />
+      <button (click)="addAlbum()" [disabled]="!newAlbumName.trim()">
+        Add Album
+      </button>
+    </div>
+  
+    <!-- Album List -->
+    <div class="album-grid" *ngIf="albums.length > 0; else noAlbums">
+      <div *ngFor="let album of albums" class="album-card">
+        <a [routerLink]="['/albums', album.id]">
+          <h2>{{ album.name }}</h2>
+          <p>{{ album.photos.length }} photo{{ album.photos.length === 1 ? '' : 's' }}</p>
+          <p>Created: {{ album.createdDate | date }}</p>
+        </a>
+      </div>
+    </div>
+  
+    <ng-template #noAlbums>
+      <p class="no-albums">No albums yet. Create one above!</p>
+    </ng-template>
+  </div>

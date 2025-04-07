@@ -1,0 +1,12 @@
+<div class="photo-card">
+    <a [routerLink]="['/viewer', albumId, photo.id]">
+      <img [src]="photo.url" [alt]="photo.title" class="photo-image" />
+    </a>
+    <div class="photo-details">
+      <h3>{{ photo.title }}</h3>
+      <p>{{ photo.dateAdded | date }}</p>
+      <button (click)="toggleFavorite()" class="favorite-btn">
+        {{ photo.isFavorite ? '★' : '☆' }}
+      </button>
+    </div>
+  </div>
