@@ -124,8 +124,9 @@ export class AlbumDetailComponent {
 
   filterPhotos(): Photo[] {
     if (!this.album || !this.filterTag) return this.album?.photos ?? [];
+    const filterTagLower = this.filterTag.toLowerCase().trim();
     return this.album.photos.filter(photo =>
-      photo.tags?.includes(this.filterTag) ?? false
+      photo.tags?.some(tag => tag.toLowerCase().includes(filterTagLower)) ?? false
     );
   }
 
