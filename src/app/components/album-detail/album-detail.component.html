@@ -47,11 +47,34 @@
         <a [routerLink]="['/viewer', album.id, photo.id]">
           <img [src]="photo.url" [alt]="photo.title" class="photo-image" />
         </a>
-        <div class="photo-info">
+        <div class="photo-info" *ngIf="editingPhotoId !== photo.id">
           <p class="photo-title">{{ photo.title }}</p>
           <p class="photo-date">{{ photo.dateAdded | date }}</p>
         </div>
-        <button class="delete-button" (click)="deletePhoto(photo.id)">Delete</button>
+        <div class="photo-edit" *ngIf="editingPhotoId === photo.id">
+          <label for="edit-title-{{photo.id}}" class="visually-hidden">Edit Title</label>
+          <input 
+            id="edit-title-{{photo.id}}"
+            type="text" 
+            [(ngModel)]="editTitle" 
+            placeholder="Edit Title" 
+            required 
+          />
+          <label for="edit-url-{{photo.id}}" class="visually-hidden">Edit URL</label>
+          <input 
+            id="edit-url-{{photo.id}}"
+            type="url" 
+            [(ngModel)]="editUrl" 
+            placeholder="Edit URL" 
+            required 
+          />
+          <button class="save-button" (click)="saveEdit()">Save</button>
+          <button class="cancel-button" (click)="cancelEdit()">Cancel</button>
+        </div>
+        <div class="button-group" *ngIf="editingPhotoId !== photo.id">
+          <button class="edit-button" (click)="startEdit(photo)">Edit</button>
+          <button class="delete-button" (click)="deletePhoto(photo.id)">Delete</button>
+        </div>
       </div>
     </div>
   </div>

@@ -1,8 +1,8 @@
 .album-detail {
-    padding: 40px 60px; // Increased padding
-    background: #1a1a1a; // Deep black background
-    color: #e0e0e0; // Light gray text
-    min-height: calc(100vh - 120px); // Adjust for navbar/footer
+    padding: 40px 60px;
+    background: #1a1a1a;
+    color: #e0e0e0;
+    min-height: calc(100vh - 120px);
   
     .welcome-section {
       text-align: center;
@@ -11,7 +11,7 @@
       h1 {
         font-size: 2.5rem;
         font-weight: 700;
-        color: #ffd700; // Yellow heading
+        color: #ffd700;
         margin-bottom: 15px;
         text-transform: uppercase;
         letter-spacing: 1px;
@@ -20,7 +20,7 @@
   
       .instructions {
         font-size: 1.1rem;
-        color: #b3b3b3; // Lighter gray
+        color: #b3b3b3;
         max-width: 800px;
         margin: 0 auto;
         line-height: 1.6;
@@ -29,7 +29,7 @@
   
     .album-title {
       font-size: 2rem;
-      color: #ffd700; // Yellow for album title
+      color: #ffd700;
       margin-bottom: 30px;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
@@ -38,7 +38,7 @@
       display: flex;
       gap: 15px;
       margin-bottom: 30px;
-      background: #2d2d2d; // Darker gray
+      background: #2d2d2d;
       padding: 15px;
       border-radius: 10px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
@@ -60,7 +60,7 @@
         border: none;
         border-radius: 6px;
         font-size: 16px;
-        background: #3a3a3a; // Dark input
+        background: #3a3a3a;
         color: #e0e0e0;
         transition: background 0.3s ease;
   
@@ -76,8 +76,8 @@
   
       button {
         padding: 12px 25px;
-        background: linear-gradient(90deg, #ffd700, #ffca2c); // Yellow gradient
-        color: #1a1a1a; // Dark text
+        background: linear-gradient(90deg, #ffd700, #ffca2c);
+        color: #1a1a1a;
         border: none;
         border-radius: 6px;
         cursor: pointer;
@@ -141,7 +141,7 @@
       gap: 20px;
   
       .photo-card {
-        background: #2d2d2d; // Dark card
+        background: #2d2d2d;
         border: 1px solid #3a3a3a;
         border-radius: 10px;
         padding: 15px;
@@ -157,7 +157,7 @@
   
         .photo-image {
           max-width: 100%;
-          height: 200px; // Fixed height
+          height: 200px;
           object-fit: cover;
           border-radius: 6px;
           cursor: pointer;
@@ -170,7 +170,7 @@
           .photo-title {
             margin: 0 0 5px;
             font-size: 1.1rem;
-            color: #ffd700; // Yellow for titles
+            color: #ffd700;
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
@@ -184,21 +184,98 @@
           }
         }
   
-        .delete-button {
-          padding: 8px 15px;
-          background: #ff4444; // Red for delete (alternative to yellow)
-          color: #fff;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-          font-size: 14px;
-          margin-top: 10px;
-          transition: background 0.3s ease, transform 0.2s ease;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        .photo-edit {
+          padding-top: 10px;
   
-          &:hover {
-            background: #cc0000;
-            transform: translateY(-2px);
+          input {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 6px;
+            background: #3a3a3a;
+            color: #e0e0e0;
+            font-size: 14px;
+  
+            &:focus {
+              outline: none;
+              background: #444444;
+            }
+  
+            &::placeholder {
+              color: #888888;
+            }
+          }
+  
+          .save-button, .cancel-button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            transition: transform 0.2s ease, background 0.3s ease;
+          }
+  
+          .save-button {
+            background: linear-gradient(90deg, #ffd700, #ffca2c);
+            color: #1a1a1a;
+  
+            &:hover {
+              transform: translateY(-2px);
+              background: linear-gradient(90deg, #ffca2c, #ffd700);
+            }
+          }
+  
+          .cancel-button {
+            background: #666666;
+            color: #fff;
+  
+            &:hover {
+              transform: translateY(-2px);
+              background: #555555;
+            }
+          }
+        }
+  
+        .button-group {
+          display: flex;
+          justify-content: center;
+          gap: 15px; // Spacing between edit and delete buttons
+          margin-top: 10px;
+  
+          .edit-button {
+            padding: 8px 15px;
+            background: #666666;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s ease, background 0.3s ease;
+  
+            &:hover {
+              transform: translateY(-2px);
+              background: #555555;
+            }
+          }
+  
+          .delete-button {
+            padding: 8px 15px;
+            background: #ff4444;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  
+            &:hover {
+              background: #cc0000;
+              transform: translateY(-2px);
+            }
           }
         }
   
@@ -226,7 +303,7 @@
       }
   
       a {
-        color: #ffd700; // Yellow link
+        color: #ffd700;
         text-decoration: none;
         font-weight: 600;
   

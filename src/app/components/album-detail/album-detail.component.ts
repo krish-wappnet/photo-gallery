@@ -18,7 +18,10 @@ export class AlbumDetailComponent {
   newPhotoUrl: string = ''; 
   newPhotoTitle: string = ''; 
   welcomeMessage: string = 'Explore Your Album!';
-  instructions: string = 'Add photos to this album using their URLs and sort them by date or name. Click a photo to view it in fullscreen or delete it. Start by adding your first photo below!';
+  instructions: string = 'Add photos to this album using their URLs, sort them by date or name, edit their details, or delete them. Click a photo to view it in fullscreen. Start by adding your first photo below!';
+  editingPhotoId: string | null = null; // Track the photo being edited
+  editTitle: string = ''; // Temporary title for editing
+  editUrl: string = ''; // Temporary URL for editing
 
   constructor(
     private route: ActivatedRoute,
@@ -46,7 +49,6 @@ export class AlbumDetailComponent {
       };
       this.album.photos.push(photo);
       this.updateStorage();
-      // Reset form inputs
       this.newPhotoUrl = '';
       this.newPhotoTitle = '';
     }
@@ -57,6 +59,30 @@ export class AlbumDetailComponent {
       this.album.photos = this.album.photos.filter(photo => photo.id !== photoId);
       this.updateStorage();
     }
+  }
+
+  startEdit(photo: Photo): void {
+    this.editingPhotoId = photo.id;
+    this.editTitle = photo.title;
+    this.editUrl = photo.url;
+  }
+
+  saveEdit(): void {
+    if (this.album && this.editingPhotoId) {
+      const photo = this.album.photos.find(p => p.id === this.editingPhotoId);
+      if (photo && (this.editTitle !== photo.title || this.editUrl !== photo.url)) {
+        photo.title = this.editTitle;
+        photo.url = this.editUrl;
+        this.updateStorage();
+      }
+      this.cancelEdit();
+    }
+  }
+
+  cancelEdit(): void {
+    this.editingPhotoId = null;
+    this.editTitle = '';
+    this.editUrl = '';
   }
 
   sortPhotos(): void {

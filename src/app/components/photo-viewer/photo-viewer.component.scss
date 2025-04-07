@@ -4,89 +4,209 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.9);
-    color: white;
+    background: #1a1a1a; // Black background
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    color: #e0e0e0;
     z-index: 1000;
-  }
   
-  .controls {
-    position: absolute;
-    top: 20px;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    padding: 10px;
-  
-    .nav-btn, .favorite-btn {
-      padding: 8px 16px;
-      background: #ffffff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-  
-      &:hover {
-        background: #e0e0e0;
-      }
-    }
-  
-    .favorite-btn {
-      background: #ffd700;
-      &.active {
-        background: #ffaa00;
-      }
-    }
-  }
-  
-  .photo-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-height: 80vh;
-    max-width: 90vw;
-  
-    .photo {
-      max-width: 100%;
-      max-height: 70vh;
-      object-fit: contain;
+    .controls {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      padding: 5px;
+      background: rgba(45, 45, 45, 0.7); // Semi-transparent dark
       border-radius: 8px;
-    }
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   
-    .photo-info {
-      margin-top: 10px;
-      text-align: center;
+      .back-btn {
+        padding: 8px 12px;
+        background: linear-gradient(90deg, #ffd700, #ffca2c); // Yellow gradient
+        color: #1a1a1a;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: transform 0.2s ease, background 0.3s ease, box-shadow 0.2s ease;
   
-      h2 {
-        margin: 0;
-        font-size: 24px;
+        &:hover {
+          transform: translateY(-2px);
+          background: linear-gradient(90deg, #ffca2c, #ffd700);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+  
+        &:active {
+          transform: scale(0.98);
+        }
       }
   
-      p {
-        margin: 5px 0;
+      .nav-btn, .slideshow-btn, .favorite-btn {
+        padding: 8px 12px;
+        background: linear-gradient(90deg, #ffd700, #ffca2c); // Yellow gradient
+        color: #1a1a1a;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
         font-size: 14px;
+        font-weight: 500;
+        transition: transform 0.2s ease, background 0.3s ease, box-shadow 0.2s ease;
+  
+        &:hover {
+          transform: translateY(-2px);
+          background: linear-gradient(90deg, #ffca2c, #ffd700);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+  
+        &:active {
+          transform: scale(0.98);
+        }
+      }
+  
+      .favorite-btn {
+        font-size: 16px;
+        padding: 8px 12px;
+  
+        &:hover {
+          color: #ffaa00; // Darker gold
+        }
+      }
+  
+      .reset-btn {
+        padding: 8px 20px; // Increased width
+        background: linear-gradient(90deg, #ffd700, #ffca2c); // Yellow gradient
+        color: #1a1a1a;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        width: 80px; // Larger width for Reset button
+        transition: transform 0.2s ease, background 0.3s ease, box-shadow 0.2s ease;
+  
+        &:hover {
+          transform: translateY(-2px);
+          background: linear-gradient(90deg, #ffca2c, #ffd700);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+  
+        &:active {
+          transform: scale(0.98);
+        }
+      }
+    }
+  
+    .zoom-controls {
+      position: absolute;
+      top: 70px; // Positioned below the main controls
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      padding: 5px;
+  
+      .zoom-btn {
+        padding: 6px;
+        width: 30px;
+        height: 30px;
+        background: transparent; // Transparent background
+        color: #ffd700;
+        border: 1px solid #ffd700;
+        border-radius: 50%; // Circular buttons
+        cursor: pointer;
+        font-size: 16px;
+        transition: color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+  
+        &:hover {
+          color: #ffca2c;
+          border-color: #ffca2c;
+          transform: scale(1.1);
+        }
+  
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+    }
+  
+    .photo-container {
+      position: relative;
+      overflow: hidden;
+      max-width: 400px; // Increased size
+      max-height: 400px; // Increased size
+      cursor: grab;
+      cursor: -webkit-grab;
+  
+      &:active {
+        cursor: grabbing;
+        cursor: -webkit-grabbing;
+      }
+  
+      .photo {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: transform 0.1s ease;
+        user-select: none;
+        border-radius: 8px;
+      }
+  
+      .photo-info {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        padding: 10px;
+        background: rgba(45, 45, 45, 0.8); // Semi-transparent dark
+        color: #e0e0e0;
+        border-radius: 6px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  
+        h2 {
+          margin: 0 0 5px;
+          font-size: 18px;
+          color: #ffd700; // Yellow
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+  
+        p {
+          margin: 0;
+          font-size: 12px;
+          color: #b3b3b3;
+        }
       }
     }
   }
   
   .error-message {
+    text-align: center;
+    padding: 30px;
+    background: #2d2d2d;
+    border-radius: 10px;
+    color: #e0e0e0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    text-align: center;
-    color: white;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 20px;
-    border-radius: 8px;
+  
+    p {
+      margin: 0 0 15px;
+      font-size: 1.2rem;
+    }
   
     a {
       color: #ffd700;
       text-decoration: none;
+      font-weight: 600;
+  
       &:hover {
         text-decoration: underline;
       }
