@@ -1,8 +1,19 @@
+<!-- navbar.component.html -->
 <nav class="navbar">
     <div class="navbar-brand">
-      <a routerLink="/albums" class="brand-link">{{ title }}</a>
+      <a routerLink="/albums" class="brand-link">
+        <span class="brand-icon">📸</span>
+        {{ title }}
+      </a>
+      <!-- Hamburger menu for mobile -->
+      <button class="menu-toggle" (click)="toggleMenu()">
+        <span class="hamburger"></span>
+      </button>
     </div>
-    <div class="navbar-menu">
+    <div class="navbar-menu" [class.active]="menuOpen">
       <a routerLink="/albums" class="nav-link">Albums</a>
+      <!-- Additional navigation items you might want -->
+      <a routerLink="/gallery" class="nav-link">Gallery</a>
+      <a routerLink="/about" class="nav-link">About</a>
     </div>
   </nav>

@@ -121,7 +121,7 @@ export class PhotoViewerComponent {
     this.resetZoom(); // Ensure image is at default size
     this.slideshowInterval = setInterval(() => {
       this.nextPhoto();
-    }, 3000);
+    }, 2000);
   }
 
   stopSlideshow(): void {

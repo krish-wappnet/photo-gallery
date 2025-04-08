@@ -80,39 +80,49 @@
       </div>
   
       <!-- Photo Grid Section -->
-      <div class="photo-grid-section">
-        <h3>Your Photos</h3>
-        <div class="photo-grid">
-          <div
-            *ngFor="let photo of filterPhotos()"
-            class="photo-card"
-            draggable="true"
-            (dragstart)="onDragStart($event, photo.id)"
-            (dragover)="onDragOver($event)"
-            (drop)="onDrop($event, photo.id)"
-          >
-            <span
-              class="custom-checkbox"
-              [ngClass]="{'checked': selectedPhotoIds.includes(photo.id)}"
-              (click)="togglePhotoSelection(photo.id); $event.stopPropagation()"
-            ></span>
-            <a [routerLink]="['/viewer', album.id, photo.id]">
-              <img [src]="photo.url" [alt]="photo.title" class="photo-image" />
-            </a>
-            <div class="photo-info">
-              <p class="photo-title">{{ photo.title }}</p>
-              <p class="photo-date">{{ photo.dateAdded | date }}</p>
-              <div class="photo-tags" *ngIf="photo.tags?.length">
-                <span class="tag" *ngFor="let tag of photo.tags">{{ tag }}</span>
-              </div>
-            </div>
-            <div class="button-group">
-              <button class="edit-button" (click)="openEditModal(photo)">Edit</button>
-              <button class="delete-button" (click)="deletePhoto(photo.id)">Delete</button>
-            </div>
+<!-- Photo Grid Section -->
+<div class="photo-grid-section">
+    <h3>Your Photos</h3>
+    <div class="photo-grid" *ngIf="filterPhotos().length > 0; else noPhotos">
+      <div
+        *ngFor="let photo of filterPhotos()"
+        class="photo-card"
+        draggable="true"
+        (dragstart)="onDragStart($event, photo.id)"
+        (dragover)="onDragOver($event)"
+        (drop)="onDrop($event, photo.id)"
+      >
+        <span
+          class="custom-checkbox"
+          [ngClass]="{'checked': selectedPhotoIds.includes(photo.id)}"
+          (click)="togglePhotoSelection(photo.id); $event.stopPropagation()"
+        ></span>
+        <a [routerLink]="['/viewer', album.id, photo.id]">
+          <img [src]="photo.url" [alt]="photo.title" class="photo-image" />
+        </a>
+        <div class="photo-info">
+          <p class="photo-title">{{ photo.title }}</p>
+          <p class="photo-date">{{ photo.dateAdded | date }}</p>
+          <div class="photo-tags" *ngIf="photo.tags?.length">
+            <span class="tag" *ngFor="let tag of photo.tags">{{ tag }}</span>
           </div>
         </div>
+        <div class="button-group">
+          <button class="edit-button" (click)="openEditModal(photo)">Edit</button>
+          <button class="delete-button" (click)="deletePhoto(photo.id)">Delete</button>
+        </div>
       </div>
+    </div>
+  
+    <!-- Humorous No Photos Message -->
+    <ng-template #noPhotos>
+      <div class="no-photos-message">
+        <h4>Oops! This album is emptier than a photographer's fridge after a long shoot!</h4>
+        <p>Why not add some photos above? The void is getting lonely.</p>
+        <span class="sad-camera">📷😢</span>
+      </div>
+    </ng-template>
+  </div>
   
       <!-- Edit Modal -->
       <div class="edit-modal" *ngIf="showEditModal" (click)="closeEditModal($event)">
